@@ -1,4 +1,16 @@
 services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    volumes:
+      - .:/app
  
   db:
     image: postgres

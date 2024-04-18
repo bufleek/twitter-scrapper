@@ -5,10 +5,11 @@
   "main": "build/src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc -w",
+    "build": "npx tsc",
     "dev": "nodemon build/src/index.js",
     "start": "node build/src/index.js",
-    "swagger": "nodemon --ignore docs.json --exec ts-node src/swagger.ts",
+    "swagger": "npx ts-node src/swagger.ts",
+    "swagger-dev": "nodemon --ignore docs.json --exec ts-node src/swagger.ts",
     "lint": "gts lint",
     "clean": "gts clean",
     "compile": "tsc",
