@@ -5,7 +5,7 @@ export class BaseScrapper {
 
   public async launch() {
     this.browser = await puppeteer.launch({
-      headless: false,
+      headless: 'shell',
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
     });

@@ -2,16 +2,18 @@
 import swaggerAutogen from 'swagger-autogen';
 
 const options = {
-  openapi: '3.0.0',
-  definition: {
-    info: {
-      title: 'Twitter Scraper API',
-      version: '1.0.0',
-    },
-    schemes: ['http', 'https'],
-    servers: ['http://localhost:3000'],
+  info: {
+    title: 'Twitter Scraper API',
+    version: '1.0.0',
+    description: 'Tweets are scrapped every minute for easy testing',
   },
+  host: 'localhost:3000',
+  schemes: ['http', 'https'],
+  consumes: ['application/json'],
+  produces: ['application/json'],
+  tags: [{name: 'Tweets', description: 'Endpoints to get tweets'}],
 };
-const apis = ['routers/*.js', 'routes/*.ts'];
 
-swaggerAutogen(options)('docs.json', apis);
+const routes = ['src/routers/*.ts'];
+
+swaggerAutogen(null, routes, null)('src/docs.json', routes, options);

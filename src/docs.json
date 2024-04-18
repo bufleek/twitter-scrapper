@@ -1,25 +1,75 @@
 {
-  "openapi": "3.0.0",
+  "swagger": "2.0",
   "info": {
+    "title": "Twitter Scraper API",
     "version": "1.0.0",
-    "title": "REST API",
-    "description": ""
+    "description": "Tweets are scrapped every minute for easy testing"
   },
-  "servers": [
+  "host": "localhost:3000",
+  "basePath": "/",
+  "tags": [
     {
-      "url": "http://localhost:3000/"
+      "name": "Tweets",
+      "description": "Endpoints to get tweets"
     }
   ],
-  "paths": {},
-  "components": {
-    "schemas": {
-      "servers": {
-        "type": "array",
-        "example": [
-          "http://localhost:3000"
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/tweets": {
+      "get": {
+        "tags": [
+          "Tweets"
         ],
-        "items": {
-          "type": "string"
+        "summary": "This endpoint returns the tweets from the database. `Scrapper runs every minute",
+        "description": "This endpoint returns the tweets from the database. Scrapper runs every minute",
+        "parameters": [
+          {
+            "name": "page",
+            "description": "Page number",
+            "required": false,
+            "type": "integer",
+            "default": 1,
+            "in": "query"
+          },
+          {
+            "name": "limit",
+            "description": "Number of tweets per page",
+            "required": false,
+            "type": "integer",
+            "default": 10,
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/live-scrap": {
+      "get": {
+        "tags": [
+          "Tweets"
+        ],
+        "summary": "This endpoint is provided for testing convenience. It `live scraps` the tweets",
+        "description": "This endpoint is provided for testing convenience. It `live scraps` the tweets",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
         }
       }
     }
