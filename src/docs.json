@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Tweets are scrapped every minute for easy testing"
   },
-  "host": "localhost:3000",
+  "host": "51.20.131.236:3000",
   "basePath": "/",
   "tags": [
     {
