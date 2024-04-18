@@ -16,6 +16,8 @@ RUN echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >
 RUN apt-get update && apt-get install -y google-chrome-stable --no-install-recommends
 RUN rm -rf /var/lib/apt/lists/*
 
+COPY . .
+
 RUN npm install
 
 RUN npm run build
