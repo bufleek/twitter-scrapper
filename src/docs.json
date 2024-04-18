@@ -1,0 +1,27 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "REST API",
+    "description": ""
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/"
+    }
+  ],
+  "paths": {},
+  "components": {
+    "schemas": {
+      "servers": {
+        "type": "array",
+        "example": [
+          "http://localhost:3000"
+        ],
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
