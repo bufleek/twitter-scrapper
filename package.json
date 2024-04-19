@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
+    "build-dev": "tsc -w",
     "dev": "nodemon build/src/index.js",
     "start": "node build/src/index.js",
     "swagger": "ts-node src/swagger.ts",
@@ -31,6 +32,7 @@
   },
   "dependencies": {
     "@prisma/client": "^5.12.1",
+    "axios": "^1.6.8",
     "express": "^4.19.2",
     "node-cron": "^3.0.3",
     "puppeteer": "^22.6.5"

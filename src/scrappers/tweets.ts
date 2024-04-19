@@ -1,9 +1,11 @@
 import {PrismaClient} from '@prisma/client';
+import axios from 'axios';
+import fs from 'fs';
 import {BaseScrapper} from './base';
 
 const prisma = new PrismaClient();
 
-interface Tweet {
+interface RawTweet {
   socialContext: string;
   user: {
     username: string;
@@ -24,6 +26,18 @@ interface Tweet {
   };
 }
 
+interface Tweet {
+  id: number;
+  authorId: number;
+  content: string;
+  images: string[];
+  hasVideo: boolean;
+  likes: number;
+  retweets: number;
+  replies: number;
+  localImages: string[];
+}
+
 export class TweetsScrapper extends BaseScrapper {
   public async scrap() {
     await this.launch();
@@ -31,11 +45,19 @@ export class TweetsScrapper extends BaseScrapper {
       const page = (await this.browser.pages())[0];
       await page.setViewport({width: 1280, height: 926});
       page.setDefaultNavigationTimeout(60000);
+
+      // TODO: Login
+
       await page.goto('https://twitter.com/coindesk', {
         waitUntil: 'networkidle0',
       });
 
       await page.waitForSelector("article[data-testid='tweet']");
+
+      // TODO: Support scroll to load more tweets
+      await page.evaluate(() => {
+        window.scrollTo(0, document.body.scrollHeight);
+      });
 
       const tweets = await page.$$eval(
         "article[data-testid='tweet']",
@@ -100,7 +122,7 @@ export class TweetsScrapper extends BaseScrapper {
                     ),
                   },
                 };
-                return tweet as Tweet;
+                return tweet as RawTweet;
               });
             }
           } catch (error) {
@@ -112,7 +134,7 @@ export class TweetsScrapper extends BaseScrapper {
       await page.close();
 
       // save tweets
-      await this.saveTweets(tweets?.filter(Boolean) as Tweet[]);
+      await this.saveTweets(tweets?.filter(Boolean) as RawTweet[]);
       return tweets;
     } catch (error) {
       try {
@@ -124,7 +146,33 @@ export class TweetsScrapper extends BaseScrapper {
     }
   }
 
-  private async saveTweets(tweets: Tweet[]) {
+  private async saveImage(tweet: Tweet) {
+    // saves images to disk
+    const folder = 'tweets/images';
+    if (!fs.existsSync(folder)) {
+      fs.mkdirSync(folder, {recursive: true});
+    }
+
+    for (const image of tweet.images) {
+      try {
+        const response = await axios.get(image, {responseType: 'arraybuffer'});
+        fs.writeFileSync(`${folder}/${tweet.id}.jpg`, response.data);
+
+        // save image to db
+        tweet.localImages.push(`${folder}/${tweet.id}.jpg`);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // update tweet with images
+    await prisma.tweet.update({
+      where: {id: tweet.id},
+      data: {localImages: tweet.localImages},
+    });
+  }
+
+  private async saveTweets(tweets: RawTweet[]) {
     for (const tweet of tweets) {
       let account = await prisma.account.findFirst({
         where: {handle: tweet.user.handle},
@@ -141,18 +189,42 @@ export class TweetsScrapper extends BaseScrapper {
         });
       }
 
-      await prisma.tweet.create({
-        data: {
-          // socialContext: tweet.socialContext,
-          content: tweet.content.text,
-          images: tweet.content.images,
-          hasVideo: tweet.content.hasVideo,
-          replies: tweet.metrics.replies,
-          retweets: tweet.metrics.retweets,
-          likes: tweet.metrics.likes,
-          authorId: account.id,
-        },
+      // check if tweet already exists
+      const existingTweet = await prisma.tweet.findFirst({
+        where: {content: tweet.content.text, authorId: account.id},
       });
+
+      if (existingTweet) {
+        continue;
+      } else {
+        const _tweet = await prisma.tweet.create({
+          data: {
+            // socialContext: tweet.socialContext,
+            content: tweet.content.text,
+            images: tweet.content.images,
+            hasVideo: tweet.content.hasVideo,
+            replies: tweet.metrics.replies,
+            retweets: tweet.metrics.retweets,
+            likes: tweet.metrics.likes,
+            authorId: account.id,
+          },
+        });
+
+        // save images
+        await this.saveImage(_tweet);
+
+        // send email if tweet has video
+        if (_tweet.hasVideo) {
+          await this.sendEmail({
+            to: '',
+          });
+        }
+      }
     }
+  }
+
+  private async sendEmail({to}: {to: string}) {
+    // send email
+    console.log(`Sending email to ${to}`);
   }
 }

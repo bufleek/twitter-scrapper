@@ -33,4 +33,5 @@ model Tweet {
   likes Int
   retweets Int
   replies Int
+  localImages String[]
 }
