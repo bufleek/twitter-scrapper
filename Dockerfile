@@ -17,4 +17,6 @@ RUN npm run build
 
 RUN npm run swagger
 
+RUN npx prisma migrate deploy
+
 CMD ["node", "build/src/index.js"]
