@@ -135,6 +135,12 @@ export class TweetsScrapper extends BaseScrapper {
 
       // save tweets
       await this.saveTweets(tweets?.filter(Boolean) as RawTweet[]);
+
+      try {
+        await this.browser.close();
+      } catch (error) {
+        console.error(error);
+      }
       return tweets;
     } catch (error) {
       try {

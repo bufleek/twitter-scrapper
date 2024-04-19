@@ -7,7 +7,7 @@ const options = {
     version: '1.0.0',
     description: 'Tweets are scrapped every minute for easy testing',
   },
-  host: '51.20.131.236:3000',
+  host: process.env.HOST || 'localhost:3000',
   schemes: ['http', 'https'],
   consumes: ['application/json'],
   produces: ['application/json'],

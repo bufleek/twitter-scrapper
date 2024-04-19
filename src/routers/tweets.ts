@@ -48,4 +48,10 @@ router.get('/live-scrap', async (req, res) => {
   }
 });
 
+// serve image files
+router.get('/tweets/images/:image', (req, res) => {
+  const {image} = req.params;
+  res.sendFile(image, {root: 'tweets/images'});
+});
+
 export default router;
