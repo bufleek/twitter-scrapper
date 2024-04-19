@@ -17,4 +17,4 @@ RUN npm run build
 
 RUN npm run swagger
 
-CMD ["node", "build/src/index.js"]
+CMD ["npm", "run", "start"]
